@@ -1,7 +1,7 @@
 #ifndef LINKED_LIST_HPP
 #define LINKED_LIST_HPP
 
-#include <exception>
+#include <stdexcept>
 #include <memory>
 
 class LinkedList {
@@ -11,9 +11,12 @@ class LinkedList {
 	struct Node {
 		int m_data;
 		NodePtr m_next;
+
+		Node(int value);
 	};
 
 	NodePtr m_head;
+	Node* m_tail;
 
 public:
 	LinkedList();
@@ -25,13 +28,17 @@ public:
 	int operator[](size_t n) const;
 	int& operator[](size_t n);
 
+	LinkedList& push_back(int value);
 	
 
 };
 
-inline LinkedList::LinkedList() : m_head{ nullptr }{}
+LinkedList::Node::Node(int value) : m_data{ value }, m_next{ nullptr }{}
 
-inline size_t LinkedList::size() const{
+
+LinkedList::LinkedList() : m_head{ nullptr }, m_tail{ nullptr }{}
+
+size_t LinkedList::size() const{
 	if (!m_head) return 0U;
 	size_t s{0U};
 	const NodePtr* node{&m_head};
@@ -54,7 +61,7 @@ int LinkedList::at(size_t n) const{
 	return (*node)->m_data;
 }
 
-inline int& LinkedList::at(size_t n) {
+int& LinkedList::at(size_t n) {
 	size_t i{ 0U };
 	const NodePtr* node{ &m_head };
 	while (i++ != n) {
@@ -64,17 +71,18 @@ inline int& LinkedList::at(size_t n) {
 	return (*node)->m_data;
 }
 
-inline int LinkedList::operator[](size_t n) const{
+int LinkedList::operator[](size_t n) const{
 	return at(n);
 }
 
-inline int& LinkedList::operator[](size_t n){
+int& LinkedList::operator[](size_t n){
 	return at(n);
 }
 
-
-
-
+LinkedList& LinkedList::push_back(int value){
+	m_tail->m_next = std::make_unique<Node>(value);
+	m_tail = m_tail->m_next.get();
+	return *this;
+}
 
 #endif // !LINKED_LIST_HPP
-
