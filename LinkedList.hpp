@@ -32,6 +32,7 @@ public:
 inline LinkedList::LinkedList() : m_head{ nullptr }{}
 
 inline size_t LinkedList::size() const{
+	if (!m_head) return 0U;
 	size_t s{0U};
 	const NodePtr* node{&m_head};
 	while ((*node)->m_next) {
