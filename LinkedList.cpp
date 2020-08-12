@@ -59,6 +59,14 @@ int& LinkedList::back(){
 	return m_tail->m_data;
 }
 
+int LinkedList::front() const{
+	return at(0);
+}
+
+int& LinkedList::front(){
+	return at(0);
+}
+
 LinkedList& LinkedList::push_back(int value) {
 	if (!m_head) {
 		// First element, make it the tail
