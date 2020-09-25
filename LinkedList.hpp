@@ -15,6 +15,17 @@ class LinkedList
 		NodePtr m_next;
 
 		Node(const T &value);
+		template <class ...Args>
+		Node(Args&& ...args);
+
+		// Inserts the given node on this node.
+		// Complexity: O(1)
+		void insertNextTo(NodePtr toInsert);
+
+		// Constructs a node in place with the arguments of its data.
+		// Complexity: O(1)
+		template <class ...Args>
+		void emplace(Args&& ...args)
 	};
 
 	NodePtr m_head;
@@ -27,18 +38,6 @@ class LinkedList
 	// Retrieves the nth node unique ptr of the list
 	// Complexity: O(n)
 	NodePtr& getNth(size_t);
-
-	class iterator {
-		friend LinkedList;
-		Node* m_ptr;
-		size_t m_pos;
-		
-		T& operator *();
-		iterator& operator ++();
-		iterator& operator --();
-		
-		iterator(Node* ptr, size_t pos);
-	};
 
 public:
 	LinkedList();
@@ -66,6 +65,11 @@ public:
 	T front() const;
 	T &front();
 
+	// Constructs element in place at given position
+	// Complexity: O(n)
+	template <class ...Args>
+	LinkedList& emplace(size_t pos, Args... args);
+
 	// Inserts a copy of the value at the tail
 	// Complexity: O(n)
 	LinkedList &push_back(T value);
@@ -78,17 +82,39 @@ public:
 	// Conplexity: O(1)
 	bool empty() const;
 
-	// Returns iterator of begin position;
-	// Complexity: O(1)
-	iterator begin();
-
-	// Returns iterator of end position;
-	// Complexity: O(1)
-	iterator end();
 };
 
 template<typename T>
 inline LinkedList<T>::Node::Node(const T& value) : m_data{ value }, m_next{ nullptr } {}
+
+template<typename T>
+inline void LinkedList<T>::Node::insertNextTo(NodePtr toInsert){
+	if (!toInsert) return;
+	if (toInsert->m_next)
+		throw std::runtime_error{ "Inserted node was a list." };
+
+	if (m_next) {
+		NodePtr next{std::move(m_next};
+		m_next = std::move(toInsert);
+		m_next->m_next = std::move(next);
+	}
+	else {
+		m_next = std::move(toInsert);
+	}
+}
+
+template <typename T>
+template <class ...Args>
+inline void LinkedList<T>::Node::emplace(Args&& ...args) {
+	if (m_next) {
+		NodePtr next{ std::move(m_next) };
+		m_next = std::make_unique<Node>(args...);
+		m_next->m_next = std::move(next);
+	}
+	else {
+		m_next = std::make_unique<Node>(args...);
+	}
+}
 
 template<typename T>
 inline typename LinkedList<T>::NodePtr& LinkedList<T>::getLast(){
@@ -100,52 +126,15 @@ inline typename LinkedList<T>::NodePtr& LinkedList<T>::getLast(){
 }
 
 template<typename T>
-inline LinkedList<T>::NodePtr& LinkedList<T>::getNth(size_t n){
-	NodePtr* node{ &m_head };
+inline typename LinkedList<T>::NodePtr& LinkedList<T>::getNth(size_t n) {
+	NodePtr* it{ &m_head };
 	for (size_t i{ 0U }; i < n; i++) {
-		if (!node)
+		if (!it)
 			throw std::out_of_range{ "Index out of range." };
-		node = &(*node)->m_next;
+		it = &(*it)->m_next;
 	}
-	return *node;
+	return *it;
 }
-
-template<typename T>
-inline LinkedList<T>::iterator::iterator(LinkedList<T>::Node* ptr, size_t) : m_ptr{ ptr }, m_pos{ pos } {}
-
-template<typename T>
-inline LinkedList<T>::iterator LinkedList<T>::begin() {
-	return iterator{*m_head,0U};
-}
-
-template<typename T>
-inline LinkedList<T>::iterator LinkedList<T>::end() {
-	return iterator{ nullptr, size()};
-}
-
-template<typename T>
-inline T& LinkedList<T>::iterator::operator*() {
-	return m_ptr->m_data;
-}
-
-template<typename T>
-inline LinkedList<T>::iterator& LinkedList<T>::iterator::operator++() {
-	m_ptr = m_ptr->m_next.get();
-	if (m_ptr)
-		m_pos++;
-	return *this;
-}
-
-template<typename T>
-inline LinkedList<T>::iterator& LinkedList<T>::iterator::operator--() {
-	if (!m_pos)
-		return *this;
-		
-	auto node{getNth(m_pos)};
-	return *this; // TODO: Fix this.
-}
-
-
 
 template<typename T>
 inline LinkedList<T>::LinkedList() : m_head{ nullptr }, m_tail{ nullptr } {}
@@ -165,35 +154,22 @@ inline size_t LinkedList<T>::size() const {
 
 template<typename T>
 inline T LinkedList<T>::at(size_t n) const {
-	const NodePtr* node{ &m_head };
-	for (size_t i{ 0U }; i < n; i++){
-		if (!node)
-			throw std::out_of_range{ "Index out of range." };
-		node = &(*node)->m_next;
-	}
-	return (*node)->m_data;
+	return getNth(n)->m_data;
 }
 
 template<typename T>
 inline T& LinkedList<T>::at(size_t n) {
- 	NodePtr *node{&m_head};
- 	for (size_t i{0U}; i < n; i++){
- 		if (!node)
- 			throw std::out_of_range{"Index out of range."};
- 		node = &(*node)->m_next;
- 	}
-
- 	return (*node)->m_data;
+	return getNth(n)->m_data;
 }
 
 template<typename T>
 inline T LinkedList<T>::operator[](size_t n) const{
-	return at(n);
+	return getNth(n)->m_data;
 }
 
 template<typename T>
 inline T& LinkedList<T>::operator[](size_t n){
-	return at(n);
+	return getNth(n)->m_data;
 }
 
 template<typename T>
@@ -208,12 +184,12 @@ inline T& LinkedList<T>::back(){
 
 template<typename T>
 inline T LinkedList<T>::front() const{
-	return at(0);
+	return getNth(0)->m_data;
 }
 
 template<typename T>
 inline T& LinkedList<T>::front(){
-	return at(0);
+	return getNth(0)->m_data;
 }
 
 template<typename T>
@@ -247,3 +223,21 @@ inline bool LinkedList<T>::empty() const{
 }
 
 #endif // !LINKED_LIST_HPP
+
+template<typename T>
+template<class ...Args>
+inline LinkedList<T>& LinkedList<T>::emplace(size_t pos, Args ...args){
+	
+	// Can throw std::out_of_range
+	NodePtr& node{ getNth(pos) };
+	
+	// Position found
+	node->insertNextTo() // TODO: rewrite this.
+
+
+	return *this;
+}
+
+template<typename T>
+template<class ...Args>
+inline LinkedList<T>::Node::Node(Args&& ...args) : m_data{ args... }, m_next{nullptr} {}

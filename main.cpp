@@ -3,14 +3,17 @@
 
 #include "LinkedList.hpp"
 
-
 void test_2(){
 	
 	LinkedList<std::string> li;
-	li.push_back("hello").push_back("Bye");
+	li.push_back("Hello")
+		.push_back("how")
+		.push_back("are")
+		.push_back("you?");
+	
 	auto size{li.size()};
 
-	for (int i{ 0 }; i < size; i++) {
+	for (unsigned i{ 0U }; i < size; i++) {
 		std::cout << li[i] << '\n';
 	}
 	std::cout << "\n\n";
@@ -44,10 +47,23 @@ void test_1() {
 	}
 }
 
+void test_3() {
+	LinkedList<std::string> li;
+	li.emplace(0, "hello")
+		.emplace(1, "bye");
+	
+	auto size{li.size()};
+	for (unsigned i{ 0U }; i < size; i++) {
+		std::cout << li[i] << std::endl;
+	}
+}
+
 int main() {
 
-	test_1();
-	test_2();
+	// test_1();
+	// test_2();
+	test_3();
+
 
 
 	return 0;
