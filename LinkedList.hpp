@@ -26,6 +26,10 @@ class LinkedList
 		// Complexity: O(1)
 		template <class ...Args>
 		void emplace(Args&& ...args);
+
+		// Erases the child node and fixes linking
+		// Complexity O(1)
+		void erase();
 	};
 
 	NodePtr m_head;
@@ -96,6 +100,10 @@ public:
 	// Complexity: O(1)
 	LinkedList& pop_front();
 
+	// Erases the value at the nth position
+	// Complexity: O(1)
+	LinkedList& erase(size_t pos);
+
 	// Whether or not the list is empty
 	// Conplexity: O(1)
 	bool empty() const;
@@ -119,6 +127,12 @@ inline void LinkedList<T>::Node::insertNextTo(NodePtr toInsert){
 	else {
 		m_next = std::move(toInsert);
 	}
+}
+
+template<typename T>
+inline void LinkedList<T>::Node::erase(){
+	if (m_next) 
+		m_next = m_next->m_next ? std::move(m_next->m_next) : nullptr;
 }
 
 template <typename T>
@@ -267,6 +281,29 @@ inline LinkedList<T>& LinkedList<T>::pop_front(){
 }
 
 template<typename T>
+inline LinkedList<T>& LinkedList<T>::erase(size_t pos){
+	// List is empty 
+	if (!m_head) return *this;
+
+	// Erasing the head node
+	if (pos == 0) {
+		m_head = m_head->m_next ? std::move(m_head->m_next) : nullptr;
+	}
+	else {
+		// Mine the (pos - 1)th  node
+		NodePtr& node{ getNth(pos - 1) };
+
+		// Erase the node next to it
+		node->erase();
+	}
+
+	// Update the tail
+	m_tail = getLast().get();
+
+	return *this;
+}
+
+template<typename T>
 inline bool LinkedList<T>::empty() const{
 	return static_cast<bool>(m_head);
 }
@@ -299,8 +336,17 @@ inline LinkedList<T>& LinkedList<T>::emplace(size_t pos, Args&& ...args){
 template<typename T>
 template<class ...Args>
 inline LinkedList<T>& LinkedList<T>::emplace_back(Args && ...args){
-	m_tail->m_next = std::make_unique<Node>(args...);
-	m_tail = m_tail->m_next.get();
+	if (!m_head) {
+		// First element, make it the tail
+		m_head = std::make_unique<Node>(args...);
+		m_tail = m_head.get();
+	}
+	else {
+		// Already something in, to straight to the tail
+		m_tail->m_next = std::make_unique<Node>(args...);
+		m_tail = m_tail->m_next.get();
+	}
+
 	return *this;
 }
 

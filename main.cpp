@@ -3,6 +3,13 @@
 
 #include "LinkedList.hpp"
 
+template <typename T>
+void print(LinkedList<T>& li, const char* sep = "\n", std::ostream& out = std::cout) {
+	size_t size{li.size()};
+	for (size_t i{ 0U }; i < size; i++) 
+		out << li[i] << sep;
+}
+
 void test_2(){
 	
 	LinkedList<std::string> li;
@@ -12,10 +19,7 @@ void test_2(){
 		.push_back("you?");
 	
 	auto size{li.size()};
-
-	for (unsigned i{ 0U }; i < size; i++) {
-		std::cout << li[i] << '\n';
-	}
+	print(li);
 	std::cout << "\n\n";
 	return;
 }
@@ -41,10 +45,7 @@ void test_1() {
 	unsigned size{ li.size() };
 
 	std::cout << std::boolalpha << "empty: " << li.empty() << "  size: " << li.size() << "\n\n";
-
-	for (unsigned i{ 0U }; i < size; i++) {
-		std::cout << li[i] << std::endl;
-	}
+	print(li);
 }
 
 void test_3() {
@@ -62,17 +63,27 @@ void test_3() {
 		.pop_front()
 		.pop_back();
 	
-	auto size{li.size()};
-	for (unsigned i{ 0U }; i < size; i++) {
-		std::cout << li[i] << std::endl;
-	}
+	print(li);
+}
+
+void test_4() {
+	LinkedList<int> li;
+	li.emplace_back(11)
+		.emplace_back(12)
+		.emplace_back(13)
+		.emplace_back(14)
+		.emplace_back(15)
+		.emplace_back(16)
+		.erase(4);
+	print(li);
 }
 
 int main() {
 	try {
 		// test_1();
 		// test_2();
-		test_3();
+		// test_3();
+		test_4();
 	}
 	catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
