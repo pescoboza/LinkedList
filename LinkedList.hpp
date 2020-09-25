@@ -88,9 +88,13 @@ public:
 	// Complexity: O(1)
 	LinkedList& push_front(T value);
 
-	// Discards the value at the tail
+	// Discards the value at the back
 	// Complexity: O(1)
 	LinkedList &pop_back();
+
+	// Discards the value at the front
+	// Complexity: O(1)
+	LinkedList& pop_front();
 
 	// Whether or not the list is empty
 	// Conplexity: O(1)
@@ -246,6 +250,20 @@ inline LinkedList<T>& LinkedList<T>::pop_back(){
  		m_tail = getLast().get();
  	}
  	return *this;
+}
+
+template<typename T>
+inline LinkedList<T>& LinkedList<T>::pop_front(){
+	if (m_head) {
+		if (m_head->m_next) {
+			m_head = std::move(m_head->m_next);
+			m_tail = getLast().get();
+		}
+		else {
+			m_head = std::move(m_head->m_next);
+		}
+	} 
+	return *this;
 }
 
 template<typename T>
