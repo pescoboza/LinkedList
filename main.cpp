@@ -56,7 +56,8 @@ void test_3() {
 		.emplace_back(1111111)
 		.emplace(1,455)
 		.emplace_front(666666666)
-		.emplace_front(666666667);
+		.emplace_front(666666667)
+		.push_front(1000);
 	
 	auto size{li.size()};
 	for (unsigned i{ 0U }; i < size; i++) {

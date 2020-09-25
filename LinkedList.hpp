@@ -84,6 +84,10 @@ public:
 	// Complexity: O(1)
 	LinkedList &push_back(T value);
 
+	// Inserts a copy of the value at the front
+	// Complexity: O(1)
+	LinkedList& push_front(T value);
+
 	// Discards the value at the tail
 	// Complexity: O(1)
 	LinkedList &pop_back();
@@ -218,6 +222,22 @@ inline LinkedList<T>& LinkedList<T>::push_back(T value){
 
  	return *this;
  }
+
+template<typename T>
+inline LinkedList<T>& LinkedList<T>::push_front(T value){
+	if (!m_head) {
+		m_head = std::make_unique<Node>();
+		m_tail = m_head.get();
+	}
+	else {
+		NodePtr next{ std::move(m_head) };
+		m_head = std::make_unique<Node>();
+		m_head->m_next = std::move(next);
+		m_tail = getLast().get();
+	}
+	m_head->m_data = value;
+	return *this;
+}
 
 template<typename T>
 inline LinkedList<T>& LinkedList<T>::pop_back(){
