@@ -25,7 +25,7 @@ class LinkedList
 		// Constructs a node in place with the arguments of its data.
 		// Complexity: O(1)
 		template <class ...Args>
-		void emplace(Args&& ...args)
+		void emplace(Args&& ...args);
 	};
 
 	NodePtr m_head;
@@ -68,7 +68,7 @@ public:
 	// Constructs element in place at given position
 	// Complexity: O(n)
 	template <class ...Args>
-	LinkedList& emplace(size_t pos, Args... args);
+	LinkedList& emplace(size_t pos, Args&&... args);
 
 	// Inserts a copy of the value at the tail
 	// Complexity: O(n)
@@ -91,10 +91,10 @@ template<typename T>
 inline void LinkedList<T>::Node::insertNextTo(NodePtr toInsert){
 	if (!toInsert) return;
 	if (toInsert->m_next)
-		throw std::runtime_error{ "Inserted node was a list." };
+		throw std::runtime_error{ "Node to insert has children." };
 
 	if (m_next) {
-		NodePtr next{std::move(m_next};
+		NodePtr next{std::move(m_next)};
 		m_next = std::move(toInsert);
 		m_next->m_next = std::move(next);
 	}
@@ -201,7 +201,8 @@ inline LinkedList<T>& LinkedList<T>::push_back(T value){
  	}
  	else{
  		// Already something in, to straight to the tail
- 		m_tail->m_next = std::make_unique<Node>(value);
+ 		m_tail->m_next = std::make_unique<Node>();
+		m_tail->m_next->m_data = value;
  		m_tail = m_tail->m_next.get();
  	}
 
@@ -226,14 +227,23 @@ inline bool LinkedList<T>::empty() const{
 
 template<typename T>
 template<class ...Args>
-inline LinkedList<T>& LinkedList<T>::emplace(size_t pos, Args ...args){
+inline LinkedList<T>& LinkedList<T>::emplace(size_t pos, Args&& ...args){
 	
-	// Can throw std::out_of_range
-	NodePtr& node{ getNth(pos) };
-	
-	// Position found
-	node->insertNextTo() // TODO: rewrite this.
+	// List is empty 
+	if (pos == 0 && !m_head) {
+		m_head = std::make_unique<Node>(args...);	
+	}
+	else {
+		// Mine the (pos - 1)th  node
+		NodePtr& node{ getNth(pos - 1) };
 
+		// Construct the new node next to it
+		node->emplace(args...);
+	}
+
+
+	// Update the tail
+	m_tail = getLast().get();
 
 	return *this;
 }

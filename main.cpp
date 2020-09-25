@@ -48,9 +48,10 @@ void test_1() {
 }
 
 void test_3() {
-	LinkedList<std::string> li;
-	li.emplace(0, "hello")
-		.emplace(1, "bye");
+	LinkedList<int> li;
+	li.emplace(0, 11)
+		.emplace(1, 12)
+		.emplace(2, 13).push_back(14);
 	
 	auto size{li.size()};
 	for (unsigned i{ 0U }; i < size; i++) {
@@ -59,12 +60,14 @@ void test_3() {
 }
 
 int main() {
-
-	// test_1();
-	// test_2();
-	test_3();
-
-
+	try {
+		// test_1();
+		// test_2();
+		test_3();
+	}
+	catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
 
 	return 0;
 }
