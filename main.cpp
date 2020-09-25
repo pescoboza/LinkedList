@@ -51,7 +51,12 @@ void test_3() {
 	LinkedList<int> li;
 	li.emplace(0, 11)
 		.emplace(1, 12)
-		.emplace(2, 13).push_back(14);
+		.emplace(2, 13)
+		.emplace_back(1231)
+		.emplace_back(1111111)
+		.emplace(1,455)
+		.emplace_front(666666666)
+		.emplace_front(666666667);
 	
 	auto size{li.size()};
 	for (unsigned i{ 0U }; i < size; i++) {

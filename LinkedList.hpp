@@ -70,8 +70,18 @@ public:
 	template <class ...Args>
 	LinkedList& emplace(size_t pos, Args&&... args);
 
+	// Constructs element in place at back
+	// Complexity: O(1)
+	template <class ...Args>
+	LinkedList& emplace_back(Args&&... args);
+	
+	// Constructs element in place at front
+	// Complexity: O(1)
+	template <class ...Args>
+	LinkedList& emplace_front(Args&&... args);
+
 	// Inserts a copy of the value at the tail
-	// Complexity: O(n)
+	// Complexity: O(1)
 	LinkedList &push_back(T value);
 
 	// Discards the value at the tail
@@ -245,6 +255,30 @@ inline LinkedList<T>& LinkedList<T>::emplace(size_t pos, Args&& ...args){
 	// Update the tail
 	m_tail = getLast().get();
 
+	return *this;
+}
+
+template<typename T>
+template<class ...Args>
+inline LinkedList<T>& LinkedList<T>::emplace_back(Args && ...args){
+	m_tail->m_next = std::make_unique<Node>(args...);
+	m_tail = m_tail->m_next.get();
+	return *this;
+}
+
+template<typename T>
+template<class ...Args>
+inline LinkedList<T>& LinkedList<T>::emplace_front(Args && ...args){
+	if (!m_head) {
+		m_head = std::make_unique<Node>(args...);
+		m_tail = m_head.get();
+	}
+	else {
+		NodePtr next{std::move(m_head)};
+		m_head = std::make_unique<Node>(args...);
+		m_head->m_next = std::move(next);
+		m_tail = getLast().get();
+	}
 	return *this;
 }
 
