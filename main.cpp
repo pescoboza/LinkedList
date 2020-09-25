@@ -1,10 +1,11 @@
 #include <iostream>
+#include <string>
 
 #include "LinkedList.hpp"
 
 int main() {
 
-	LinkedList li;
+	LinkedList<int> li;
 	std::cout << std::boolalpha << "empty: " << li.empty() << "  size: " << li.size() << "\n\n";
 
 

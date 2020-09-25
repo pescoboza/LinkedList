@@ -10,8 +10,7 @@ class LinkedList
 	struct Node;
 	using NodePtr = std::unique_ptr<Node>;
 
-	struct Node
-	{
+	struct Node{
 		T m_data;
 		NodePtr m_next;
 
@@ -21,7 +20,7 @@ class LinkedList
 	NodePtr m_head;
 	Node *m_tail;
 
-	// Retrieves the last node of the list
+	// Retrieves the last node unique ptr of the list
 	// Complexity: O(n)
 	NodePtr &getLast();
 
@@ -68,7 +67,7 @@ template<typename T>
 inline LinkedList<T>::Node::Node(const T& value) : m_data{ value }, m_next{ nullptr } {}
 
 template<typename T>
-inline LinkedList<T>::NodePtr& LinkedList<T>::getLast(){
+inline typename LinkedList<T>::NodePtr& LinkedList<T>::getLast(){
 	NodePtr* it{ &m_head };
 	while ((*it)->m_next){
 		it = &(*it)->m_next;
