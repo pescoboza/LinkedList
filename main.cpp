@@ -3,8 +3,21 @@
 
 #include "LinkedList.hpp"
 
-int main() {
 
+void test_2(){
+	
+	LinkedList<std::string> li;
+	li.push_back("hello").push_back("Bye");
+	auto size{li.size()};
+
+	for (int i{ 0 }; i < size; i++) {
+		std::cout << li[i] << '\n';
+	}
+	std::cout << "\n\n";
+	return;
+}
+
+void test_1() {
 	LinkedList<int> li;
 	std::cout << std::boolalpha << "empty: " << li.empty() << "  size: " << li.size() << "\n\n";
 
@@ -29,6 +42,12 @@ int main() {
 	for (unsigned i{ 0U }; i < size; i++) {
 		std::cout << li[i] << std::endl;
 	}
+}
+
+int main() {
+
+	test_1();
+	test_2();
 
 
 	return 0;

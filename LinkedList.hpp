@@ -24,6 +24,22 @@ class LinkedList
 	// Complexity: O(n)
 	NodePtr &getLast();
 
+	// Retrieves the nth node unique ptr of the list
+	// Complexity: O(n)
+	NodePtr& getNth(size_t);
+
+	class iterator {
+		friend LinkedList;
+		Node* m_ptr;
+		size_t m_pos;
+		
+		T& operator *();
+		iterator& operator ++();
+		iterator& operator --();
+		
+		iterator(Node* ptr, size_t pos);
+	};
+
 public:
 	LinkedList();
 
@@ -61,6 +77,14 @@ public:
 	// Whether or not the list is empty
 	// Conplexity: O(1)
 	bool empty() const;
+
+	// Returns iterator of begin position;
+	// Complexity: O(1)
+	iterator begin();
+
+	// Returns iterator of end position;
+	// Complexity: O(1)
+	iterator end();
 };
 
 template<typename T>
@@ -74,6 +98,54 @@ inline typename LinkedList<T>::NodePtr& LinkedList<T>::getLast(){
 	}
 	return *it;
 }
+
+template<typename T>
+inline LinkedList<T>::NodePtr& LinkedList<T>::getNth(size_t n){
+	NodePtr* node{ &m_head };
+	for (size_t i{ 0U }; i < n; i++) {
+		if (!node)
+			throw std::out_of_range{ "Index out of range." };
+		node = &(*node)->m_next;
+	}
+	return *node;
+}
+
+template<typename T>
+inline LinkedList<T>::iterator::iterator(LinkedList<T>::Node* ptr, size_t) : m_ptr{ ptr }, m_pos{ pos } {}
+
+template<typename T>
+inline LinkedList<T>::iterator LinkedList<T>::begin() {
+	return iterator{*m_head,0U};
+}
+
+template<typename T>
+inline LinkedList<T>::iterator LinkedList<T>::end() {
+	return iterator{ nullptr, size()};
+}
+
+template<typename T>
+inline T& LinkedList<T>::iterator::operator*() {
+	return m_ptr->m_data;
+}
+
+template<typename T>
+inline LinkedList<T>::iterator& LinkedList<T>::iterator::operator++() {
+	m_ptr = m_ptr->m_next.get();
+	if (m_ptr)
+		m_pos++;
+	return *this;
+}
+
+template<typename T>
+inline LinkedList<T>::iterator& LinkedList<T>::iterator::operator--() {
+	if (!m_pos)
+		return *this;
+		
+	auto node{getNth(m_pos)};
+	return *this; // TODO: Fix this.
+}
+
+
 
 template<typename T>
 inline LinkedList<T>::LinkedList() : m_head{ nullptr }, m_tail{ nullptr } {}
@@ -99,6 +171,7 @@ inline T LinkedList<T>::at(size_t n) const {
 			throw std::out_of_range{ "Index out of range." };
 		node = &(*node)->m_next;
 	}
+	return (*node)->m_data;
 }
 
 template<typename T>
