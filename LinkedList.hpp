@@ -2,7 +2,12 @@
 #define LINKED_LIST_HPP
 
 #include <exception>
+#include <functional>
 #include <memory>
+#include <vector>
+
+#include "Algorithm.hpp"
+
 
 template <typename T>
 class LinkedList
@@ -42,6 +47,13 @@ class LinkedList
 	// Retrieves the nth node unique ptr of the list
 	// Complexity: O(n)
 	NodePtr& getNth(size_t);
+	
+	// Helper to insert moved node at the tail
+	LinkedList<T>& insertNodeBack(NodePtr node);
+
+	// Returns the head node. WARNING: Does not update tail!
+	// Complexity: O(1)
+	NodePtr extractFront();
 
 public:
 	LinkedList();
@@ -107,7 +119,8 @@ public:
 	// Whether or not the list is empty
 	// Conplexity: O(1)
 	bool empty() const;
-
+	
+	LinkedList& sort();
 };
 
 template<typename T>
@@ -166,6 +179,35 @@ inline typename LinkedList<T>::NodePtr& LinkedList<T>::getNth(size_t n) {
 		it = &(*it)->m_next;
 	}
 	return *it;
+}
+
+template<typename T>
+inline LinkedList<T>& LinkedList<T>::insertNodeBack(NodePtr node){
+	if (node) {
+	
+		if (!m_head) {
+			m_head = std::move(node);
+			m_tail = m_head.get();
+		}
+		else {
+			m_tail->m_next = std::move(node);
+			m_tail = m_tail->m_next.get();
+		}
+	}
+	return *this;
+}
+
+template<typename T>
+inline typename LinkedList<T>::NodePtr LinkedList<T>::extractFront(){
+	if (!m_head) return nullptr;
+	if (m_head->m_next) {
+		NodePtr oldHead{ std::move(m_head)};
+		m_head = std::move(oldHead->m_next);
+		oldHead->m_next = nullptr;
+		return std::move(oldHead);
+	}
+	m_tail = nullptr;
+	return std::move(m_head);	
 }
 
 template<typename T>
@@ -308,7 +350,6 @@ inline bool LinkedList<T>::empty() const{
 	return static_cast<bool>(m_head);
 }
 
-#endif // !LINKED_LIST_HPP
 
 template<typename T>
 template<class ...Args>
@@ -367,5 +408,37 @@ inline LinkedList<T>& LinkedList<T>::emplace_front(Args && ...args){
 }
 
 template<typename T>
+inline LinkedList<T>& LinkedList<T>::sort(){
+	using RefWrapT = std::reference_wrapper<T>;
+	using Pair = std::pair<RefWrapT, NodePtr>;
+	using Map = std::vector<Pair>;
+
+	if (!m_head) 
+		return *this;
+	
+	Map map;
+
+	// Extract all the nodes and insert then into the map
+	while (true) {
+		NodePtr node{ extractFront() };
+		if (!node) break;
+		map.emplace_back(node->m_data, std::move(node));
+		auto& back{ map.back()};
+		back.first = back.second->m_data;
+	}
+		
+	// Sort the map
+	alg::quick_sort(map.begin(), map.end());
+
+	// Insert all the nodes back in to the list
+	for (auto& p : map) 
+		insertNodeBack(std::move(p.second));
+	
+	return *this;
+}
+
+template<typename T>
 template<class ...Args>
 inline LinkedList<T>::Node::Node(Args&& ...args) : m_data{ args... }, m_next{nullptr} {}
+
+#endif // !LINKED_LIST_HPP

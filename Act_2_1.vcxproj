@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Algorithm.hpp" />
     <ClInclude Include="LinkedList.hpp" />
   </ItemGroup>
   <ItemGroup>

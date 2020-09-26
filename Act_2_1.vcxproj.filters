@@ -18,6 +18,9 @@
     <ClInclude Include="LinkedList.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Algorithm.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

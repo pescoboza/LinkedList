@@ -78,12 +78,31 @@ void test_4() {
 	print(li);
 }
 
+void test_5() {
+	LinkedList<long long int> li;
+	li.emplace_back(55)
+		.emplace_back(77)
+		.emplace_back(44)
+		.emplace_back(22)
+		.emplace_back(11)
+		.emplace_back(33)
+		.emplace_back(99)
+		.emplace_back(88);
+	std::cout << "Unsorted:\n";
+	print(li, " ");
+	
+	li.sort();
+	std::cout << "\n\nSorted:\n";
+	print(li, " ");
+}
+
 int main() {
 	try {
 		// test_1();
 		// test_2();
 		// test_3();
-		test_4();
+		// test_4();
+		test_5();
 	}
 	catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
